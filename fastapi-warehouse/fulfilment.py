@@ -20,11 +20,14 @@ while True:
                 obj = result[1][0][1]
                 try:
                     prodcut = Product.get(obj['product_id'])
+                    if prodcut.quantity < int(obj['quantity']):
+                        redis.xadd(name="refund-order", fields=obj)
+                        break
                     prodcut.quantity -= int(obj['quantity'])
                     prodcut.save()
                     print(prodcut)
                 except:
-                    redis.xadd(name="refound-order", fields=obj)
+                    redis.xadd(name="refund-order", fields=obj)
 
     except Exception as e:
         print(str(e))
